@@ -5,5 +5,5 @@ Our development team for this project consists of: <br>
 <i>More info coming soon...please standby</b>
 
 ## Other Team Cartographer Projects 
-<a href="https://github.com/abhi-arya1/cartographerADC23">2023 NASA App Development Challenge</a> - Top 3 Nationwide 
+<a href="https://github.com/abhi-arya1/cartographerADC23">2023 NASA App Development Challenge</a> - Top 3 Nationwide </b>
 <a href="https://github.com/abhi-arya1/Kibo-RPC">2023 NASA & JAXA Kibo Robot Programming Challenge 2023</a> - Top 10 Nationwide
