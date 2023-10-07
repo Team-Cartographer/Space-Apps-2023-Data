@@ -16,21 +16,23 @@ with open(data_file_path, mode="r") as data_file:
     data: list = list(csv.reader(data_file, delimiter=','))
     data_file.close()
 
-def get_datetime(row: int) -> str: 
+
+def get_datetime(row: int) -> str:
     datetime: str = data[row][0]
     return datetime
+
 
 def get_mag_field_vec(row: int):
     mag_field = (float(data[row][1]), float(data[row][2]), float(data[row][3]))
     return mag_field
 
-def get_flux_measurements(row: int) -> list: 
+
+def get_flux_measurements(row: int) -> list:
     flux_measurements: list = [float(data[row][x]) for x in range(4, 53)]
-    for i in range(len(flux_measurements)):
-        if flux_measurements[i] == 0:
-            flux_measurements[i] = "NaN"
-        
+    flux_measurements = ["NaN" if measurement == 0 else measurement for measurement in flux_measurements]
+
     return flux_measurements
+
 
 def get_data_object(row: int, display_flux: bool) -> list:
     data_object = []
@@ -41,12 +43,14 @@ def get_data_object(row: int, display_flux: bool) -> list:
     
     return data_object
 
+
 def get_data_list(disp_flux) -> list:
     data_list = []
     for i in tqdm(range(len(data)), desc="Compiling Data"): 
         data_list.append(get_data_object(i, display_flux=disp_flux))
     
     return data_list
+
 
 if __name__ == "__main__":
     print(get_data_list(False)[0])
