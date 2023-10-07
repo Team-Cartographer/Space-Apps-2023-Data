@@ -2,12 +2,9 @@ import sys
 import venv
 from os import getcwd, path
 from subprocess import run
-import time as time
 
 venv_folder = path.join(getcwd(), "subprocess_venv")
 if not path.exists(venv_folder):
-
-    start = time()
 
     print("Creating virtual environment")
     venv.create("subprocess_venv", with_pip=True)
@@ -20,7 +17,7 @@ if not path.exists(venv_folder):
         run([sys.executable, "-m", "pip", "install", package], check=True)
         print(f"Installed package: {package}")
 
-    print(f"Venv creation completed in {round(time()-start, 2)}s")
+    print(f"Venv creation completed")
 
 
 class CodeNotWrittenError(Exception):
@@ -30,5 +27,6 @@ class CodeNotWrittenError(Exception):
 
 
 if __name__ == "__main__":
-    raise CodeNotWrittenError()
+    pass
+    #raise CodeNotWrittenError()
   
