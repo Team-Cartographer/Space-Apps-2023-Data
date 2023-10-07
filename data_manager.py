@@ -1,12 +1,12 @@
 import csv 
-# import numpy as np
+import numpy as np
 # import os  
 # import math 
 
 from utils import * 
 from tqdm import tqdm 
 
-year = 2019
+year = 2023
 data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data"
 data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
 
@@ -22,7 +22,7 @@ def get_datetime(row: int) -> str:
 
 
 def get_mag_field_vec(row: int):
-    mag_field = (float(data[row][1]), float(data[row][2]), float(data[row][3]))
+    mag_field = np.array([float(data[row][1]), float(data[row][2]), float(data[row][3])])
     return mag_field
 
 
@@ -53,4 +53,4 @@ def get_data_list(disp_flux: bool) -> list:
 if __name__ == "__main__":
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
-    print(get_data_list(False)[0])
+    print(get_data_list(False)[12600:12700])
