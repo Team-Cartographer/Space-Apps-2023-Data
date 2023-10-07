@@ -5,6 +5,18 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt 
 
 
+def quiet_day(self, K):
+    k_avg = np.mean(K)
+    k_norm = K / k_avg
+    qdc = np.mean(k_norm)
+    return k_norm
+
+def h_max(self, ):
+
+
+
+
+
 # class KalmanFilter:
 #     def __init__(self, init_m, second_m):
 #         pass
@@ -19,57 +31,60 @@ import matplotlib.pyplot as plt
 # class MovingAvgFilter:
 #     def __init__(self):
 #         pass
+class KalmanFilter:
+    def __init__(self):
+        raise CodeNotWrittenError
 
-def kalman_filter(initial_state, initial_estimate_error, measurement_noise, process_noise, measurements):
-    # Initialize state variables
-    state_estimate = initial_state
-    estimate_error = initial_estimate_error
-    
-    filtered_states = []
+    def kalman_filter(initial_state, initial_estimate_error, measurement_noise, process_noise, measurements):
+        # Initialize state variables
+        state_estimate = initial_state
+        estimate_error = initial_estimate_error
 
-    for measurement in tqdm(measurements, desc="Filtering Data"):
-        # Prediction Step
-        predicted_state = state_estimate
-        predicted_estimate_error = estimate_error + process_noise
+        filtered_states = []
 
-        # Update Step
-        kalman_gain = np.dot(predicted_estimate_error, np.linalg.inv(predicted_estimate_error + measurement_noise))
-        state_estimate = predicted_state + np.dot(kalman_gain, (measurement - predicted_state))
-        estimate_error = np.dot((np.eye(len(initial_state)) - kalman_gain), predicted_estimate_error)
+        for measurement in tqdm(measurements, desc="Filtering Data"):
+            # Prediction Step
+            predicted_state = state_estimate
+            predicted_estimate_error = estimate_error + process_noise
 
-        filtered_states.append(state_estimate)
+            # Update Step
+            kalman_gain = np.dot(predicted_estimate_error, np.linalg.inv(predicted_estimate_error + measurement_noise))
+            state_estimate = predicted_state + np.dot(kalman_gain, (measurement - predicted_state))
+            estimate_error = np.dot((np.eye(len(initial_state)) - kalman_gain), predicted_estimate_error)
 
-    return filtered_states
+            filtered_states.append(state_estimate)
 
-# Example usage
-if __name__ == "__main__":
-    # Simulated measurements (3D vectors)
-    measurements = [dm.get_mag_field_vec(x) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
-    dates = [dm.get_datetime(x) for x in tqdm(range(len(dm.data)), desc="Getting Dates")]
+        return filtered_states
 
-    initial_state = np.array([measurements[12000][0], measurements[12000][1], measurements[12000][2]])  # Initial state estimate (3D vector)
-    initial_estimate_error = np.eye(3)  # Initial estimate error covariance matrix (3x3)
-    measurement_noise = np.eye(3)  # Measurement noise covariance matrix (3x3)
-    process_noise = np.eye(3) * 0.05  # Process noise covariance matrix (3x3)
+    # Example usage
+    if __name__ == "__main__":
+        # Simulated measurements (3D vectors)
+        measurements = [dm.get_mag_field_vec(x) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
+        dates = [dm.get_datetime(x) for x in tqdm(range(len(dm.data)), desc="Getting Dates")]
 
-    filtered_states = kalman_filter(initial_state, initial_estimate_error, measurement_noise, process_noise, measurements)
+        initial_state = np.array([measurements[12000][0], measurements[12000][1], measurements[12000][2]])  # Initial state estimate (3D vector)
+        initial_estimate_error = np.eye(3)  # Initial estimate error covariance matrix (3x3)
+        measurement_noise = np.eye(3)  # Measurement noise covariance matrix (3x3)
+        process_noise = np.eye(3) * 0.05  # Process noise covariance matrix (3x3)
 
-    fig, ax1 = plt.subplots()
+        filtered_states = kalman_filter(initial_state, initial_estimate_error, measurement_noise, process_noise, measurements)
 
-    # Plot the first data on the first Y-axis (left)
-    ax1.plot(dates[12000:13000], measurements[12000:13000], color='tab:blue')
-    ax1.set_xlabel('X-axis')
-    ax1.set_ylabel('Y1-axis', color='tab:blue')
+        fig, ax1 = plt.subplots()
 
-    # Create a second set of Y-axes that shares the same X-axis
-    ax2 = ax1.twinx()
+        # Plot the first data on the first Y-axis (left)
+        ax1.plot(dates[12000:13000], measurements[12000:13000], color='tab:blue')
+        ax1.set_xlabel('X-axis')
+        ax1.set_ylabel('Y1-axis', color='tab:blue')
 
-    # Plot the second data on the second Y-axis (right)
-    ax2.plot(dates[12000:13000], filtered_states[12000:13000], color='tab:red')
-    ax2.set_ylabel('Y2-axis', color='tab:red')
+        # Create a second set of Y-axes that shares the same X-axis
+        ax2 = ax1.twinx()
 
-    # Add a title
-    plt.title('Graph')
+        # Plot the second data on the second Y-axis (right)
+        ax2.plot(dates[12000:13000], filtered_states[12000:13000], color='tab:red')
+        ax2.set_ylabel('Y2-axis', color='tab:red')
 
-    # Show the plot
-    plt.show()
+        # Add a title
+        plt.title('Graph')
+
+        # Show the plot
+        plt.show()
