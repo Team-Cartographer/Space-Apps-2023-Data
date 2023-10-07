@@ -22,5 +22,7 @@ if not path.exists(venv_folder):
 
 
 if __name__ == "__main__":
-    raise CodeNotWrittenError
+    print('Hello world')
+    #raise CodeNotWrittenError
+
   
