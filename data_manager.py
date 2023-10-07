@@ -28,7 +28,7 @@ def get_flux_measurements(row: int) -> list:
     flux_measurements: list = [float(data[row][x]) for x in range(4, 53)]
     for i in range(len(flux_measurements)):
         if flux_measurements[i] == 0:
-            flux_measurements[i] == "NaN"
+            flux_measurements[i] = "NaN"
         
     return flux_measurements
 
@@ -41,15 +41,14 @@ def get_data_object(row: int, display_flux: bool) -> list:
     
     return data_object
 
-if __name__ == "__main__":
+def get_data_list(disp_flux) -> list:
     data_list = []
     for i in tqdm(range(len(data)), desc="Compiling Data"): 
-        data_list.append(get_data_object(i, display_flux=False))
+        data_list.append(get_data_object(i, display_flux=disp_flux))
     
-    # not working, but leave it for now 
-    # x = input(f"Enter a date in '{year}-MM-DD' format: ")
-    # for daily_data in data_list:
-    #     if(x == daily_data[0].split()[0]):
-    #         print(daily_data)
+    return data_list
+
+if __name__ == "__main__":
+    print(get_data_list(False)[0])
 
 
