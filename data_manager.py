@@ -34,8 +34,8 @@ def get_flux_measurements(row: int) -> list:
     return flux_measurements
 
 
-def get_data_object(row: int, display_flux: bool) -> list:
-    data_object = []
+def get_data_object(row: int, display_flux: bool) -> list:  # add additional proper type hinting later
+    data_object: list  # add additional typing later
     if display_flux:
         data_object = [get_datetime(row), get_mag_field_vec(row), get_flux_measurements(row)] 
     else:
@@ -54,5 +54,3 @@ def get_data_list(disp_flux) -> list:
 
 if __name__ == "__main__":
     print(get_data_list(False)[0])
-
-
