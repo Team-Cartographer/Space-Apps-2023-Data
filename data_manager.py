@@ -42,6 +42,7 @@ def get_data_object(row: int, display_flux: bool) -> list:  # add additional pro
     
     return data_object
 
+
 def get_data_list(disp_flux: bool) -> list:
     data_list = []
     for i in tqdm(range(len(data)), desc="Compiling Data"): 
