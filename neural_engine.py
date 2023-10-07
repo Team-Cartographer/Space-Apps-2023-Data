@@ -5,6 +5,8 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 from utils import *
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 train = datasets.MNIST(root="data", download=True, train=True, transform=ToTensor())  # double check the file source
 # I need to review the documentation for this, but it should properly import most of the dependencies that we need
 # we need to come back to this later, but good enough for now
