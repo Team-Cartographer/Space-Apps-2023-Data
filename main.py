@@ -2,6 +2,7 @@ import sys
 import venv
 from os import getcwd, path
 from subprocess import run
+from utils import CodeNotWrittenError
 
 venv_folder = path.join(getcwd(), "subprocess_venv")
 if not path.exists(venv_folder):
@@ -20,13 +21,6 @@ if not path.exists(venv_folder):
     print(f"Venv creation completed")
 
 
-class CodeNotWrittenError(Exception):
-    def __init__(self, message="This code is not implemented yet"):
-        self.message = message
-        super().__init__(self.message)
-
-
 if __name__ == "__main__":
-    pass
-    #raise CodeNotWrittenError()
+    raise CodeNotWrittenError
   

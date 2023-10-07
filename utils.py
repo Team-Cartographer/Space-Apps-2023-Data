@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from time import time 
 
+
 def timeit(method):
     def timed(*args, **kw):
         time_start = time()
@@ -11,6 +12,7 @@ def timeit(method):
         return result
 
     return timed
+
 
 def show_error(err_type, msg):
     root = tk.Tk()
@@ -22,3 +24,9 @@ def show_info(title, msg):
     root = tk.Tk()
     root.withdraw()
     messagebox.showinfo(title, msg)
+
+
+class CodeNotWrittenError(Exception):
+    def __init__(self, message="This code is not implemented yet"):
+        self.message = message
+        super().__init__(self.message)
