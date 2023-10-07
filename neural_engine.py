@@ -3,7 +3,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
-from main import CodeNotWrittenError
+from utils import *
 
 train = datasets.MNIST(root="data", download=True, train=True, transform=ToTensor())  # double check the file source
 # I need to review the documentation for this, but it should properly import most of the dependencies that we need

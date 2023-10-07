@@ -2,7 +2,7 @@ import sys
 import venv
 from os import getcwd, path
 from subprocess import run
-from utils import CodeNotWrittenError
+from utils import *
 
 venv_folder = path.join(getcwd(), "subprocess_venv")
 if not path.exists(venv_folder):

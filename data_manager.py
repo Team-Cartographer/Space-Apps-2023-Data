@@ -1,7 +1,8 @@
 import numpy as np
 import os  
 import math 
-import csv 
+import csv
+from utils import *
 
 
 # access the data (for now, change this to your local data location) 
