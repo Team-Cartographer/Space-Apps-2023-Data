@@ -5,19 +5,26 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt 
 
 
-def quiet_day(self, K):
+def quiet_day(K):
     k_avg = np.mean(K)
     k_norm = K / k_avg
     qdc = np.mean(k_norm)
-    return k_norm
+    return qdc
 
-def h_max(self, ):
+def find_kp(x, y, qdc, _C):
+    h_val = np.sqrt((x ** 2)+(y ** 2))
+    h_max = np.max(h_val)
+    a = (h_max - qdc)/qdc
+    k_p = 0.67 * np.log10(a) + _C
+    return k_p
 
 
 
 
 
-# class KalmanFilter:
+
+
+    #class KalmanFilter:
 #     def __init__(self, init_m, second_m):
 #         pass
     
