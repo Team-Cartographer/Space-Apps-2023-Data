@@ -4,7 +4,6 @@ import csv
 # import math 
 
 from utils import * 
-from datetime import datetime
 from tqdm import tqdm 
 
 year = 2019
@@ -41,7 +40,7 @@ def get_data_object(row: int, display_flux: bool) -> list:
     
     return data_object
 
-def get_data_list(disp_flux) -> list:
+def get_data_list(disp_flux: bool) -> list:
     data_list = []
     for i in tqdm(range(len(data)), desc="Compiling Data"): 
         data_list.append(get_data_object(i, display_flux=disp_flux))
@@ -49,6 +48,8 @@ def get_data_list(disp_flux) -> list:
     return data_list
 
 if __name__ == "__main__":
+    # in the end, this should gain data from a live source, and then push it out to firebase. 
+    # this file will probably require some changes soon 
     print(get_data_list(False)[0])
 
 
