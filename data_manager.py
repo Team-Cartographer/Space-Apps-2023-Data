@@ -29,38 +29,44 @@ def create_dataset(data, kpData):
     first_reading = data['mag_field'][0]
     filt = KalmanFilter3D([first_reading[0], first_reading[1], first_reading[2]])
     filtered_data = filt.filter_measurements(data['mag_field'])
+
     dataset = []
-    temp_constant_row = []
-    temp_training_row = []
+    temp_row = []
+    filtered_avg = []
 
     for i in tqdm(range(len(data)), desc="Building Dataset"): 
-        if i % 180 == 0: # 3 hour gap every 180 points  
-            dataset.append([temp_constant_row, temp_training_row]) if i != 0 else None 
-            temp_constant_row, temp_training_row = [], []
+        if i % 180 == 0: 
+            # 3 hour gap every 180 points  
+            #print(f"[{temp_row[0]}, {temp_row[1][0:10]}]\n") if i != 0 else None
+            if i != 0:
+                average = np.mean(np.mean(filtered_avg, axis=1))
+                temp_row.append(average)
+            dataset.append(temp_row) # if i != 0 else None 
+            temp_row = []
 
             start_time = data['datetime'][i]
             start_date = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
-            end_time = (start_date + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S")
-            kp_value = kpData[start_date.strftime("%Y-%m-%d %H:%M:%S")]
+            #end_time = (start_date + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S")
+            kp_value = int(kpData[start_date.strftime("%Y-%m-%d %H:%M:%S")])
 
-            temp_constant_row.append(start_time)
-            temp_constant_row.append(end_time)
-            temp_constant_row.append([]) # raw mag field
-            temp_constant_row.append([]) # faraday data
+            #temp_row.append(start_time)
+            #temp_row.append(end_time)
+            #temp_row.append([]) # raw mag field
+            #temp_row.append([]) # faraday data
 
-            temp_training_row.append(kp_value)
-            temp_training_row.append([]) # filtered mag field 
+            temp_row.append(kp_value)
+            temp_row.append([]) # filtered mag field 
         else: 
-            temp_constant_row[2].append(data['mag_field'][i])
-            temp_constant_row[3].append(data['flux_measurements'][i])
+            filtered_avg.append(filtered_data[i])
+            temp_row[1].append(filtered_data[i])
+            #temp_row[2].append(data['mag_field'][i])
+            #temp_row[3].append(data['flux_measurements'][i])
 
-            temp_training_row[1].append(filtered_data[i])
-
-    return dataset
+    return dataset[1:]
 
 
-def get_training_data(years=1, print_year=False, start_year=2016):
-    if years > 5:
+def get_training_data(start_year=2016, years=1, print_year=False):
+    if years > 5 or start_year > 2021:
         raise ValueError # years cannot be greater than 5 until alex finishes kp data calculation 
     
     rows, all_datasets = [], []
@@ -99,7 +105,6 @@ if __name__ == "__main__":
     # this file will probably require some changes soon 
 
     # Example usage
-    #x = get_training_data(start_year=2023)
     #x = get_training_data(1)[0][i][1][1] -> filtered data per 3 hour period 
     # print(x)
     # indexes, explained -> 
@@ -107,5 +112,7 @@ if __name__ == "__main__":
     # second [0] -> first entry dataset for 2016 [constant_row, training_row]
     # third [1] -> training_row from first dataset for 2016
     # fourth [0] -> kp value fromt training row for first dataset (2016) [1] would be the filtered data
-
+    dataset = get_training_data()[0]
+    print(np.array([arr[1] for arr in dataset]).reshape(-1, 1))
+    
     pass

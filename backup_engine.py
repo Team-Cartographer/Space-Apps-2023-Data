@@ -41,7 +41,5 @@ class KalmanFilter3D:
         return np.array(filtered_states)
 
 
-if __name__ == "__main__":
-    raise NoExampleError
 
 
