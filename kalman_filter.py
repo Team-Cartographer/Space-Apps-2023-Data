@@ -4,26 +4,26 @@ from tqdm import tqdm
 
 class KalmanFilter3D:
     def __init__(self, initial_state):
-        # Initialize state variables as numpy arrays
         self.state_estimate = np.array(initial_state)
         self.estimate_error = np.eye(3)  # Initial estimate error covariance matrix (3x3)
         self.measurement_noise = np.eye(3)  # Measurement noise covariance matrix (3x3)
         self.process_noise = np.eye(3) * 0.05  # Process noise covariance matrix (3x3)
 
     def predict(self):
-        # Prediction Step
+        # predicter
         predicted_state = self.state_estimate
         predicted_estimate_error = self.estimate_error + self.process_noise
         return predicted_state, predicted_estimate_error
 
     def update(self, measurement):
-        # Update Step
+        # updater
         predicted_state, predicted_estimate_error = self.predict()
         kalman_gain = np.dot(predicted_estimate_error, np.linalg.inv(predicted_estimate_error + self.measurement_noise))
         self.state_estimate = predicted_state + np.dot(kalman_gain, (measurement - predicted_state))
         self.estimate_error = np.dot((np.eye(3) - kalman_gain), predicted_estimate_error)
 
     def filter_measurements(self, measurements):
+        # actual filtration method 
         filtered_states = []
         last_valid = []
 
@@ -40,6 +40,7 @@ class KalmanFilter3D:
 
         return np.array(filtered_states)
 
-
+if __name__ == "__main__":
+    raise CodeNotWrittenError(message="There is no example here.")
 
 

@@ -1,9 +1,11 @@
 import numpy as np
 import csv 
+import pickle 
 from datetime import datetime, timedelta
 from utils import * 
 from tqdm import tqdm 
-from backup_engine import KalmanFilter3D
+from kalman_filter import KalmanFilter3D
+from os import path
 
 @timeit
 def setup_data(data) -> np.ndarray:
@@ -65,13 +67,13 @@ def create_dataset(data, kpData):
     return dataset[1:]
 
 
-def get_training_data(start_year=2016, years=1, print_year=False):
+def get_dataset(start_year=2016, years=1, print_year=False):
     if years > 5 or start_year > 2021:
         raise ValueError # years cannot be greater than 5 until alex finishes kp data calculation 
     
     rows, all_datasets = [], []
     KpDict: dict = {}
-    with open('K_p_DATA.dat', mode='r') as f:
+    with open('data/historic_kp_data.dat', mode='r') as f:
         for line in f:
             fields = line.strip().split()
             rows.append(fields)
@@ -85,16 +87,27 @@ def get_training_data(start_year=2016, years=1, print_year=False):
 
     for i in range(0, years): 
         year = start_year + i # DO NOT USE >2022 YET
-        print(f'{i+1}. {year}') if print_year else None
-        # customize to your liking 
-        data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
-        data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
-        with open(data_file_path, mode="r") as data_file:
-            data: list = list(csv.reader(data_file, delimiter=','))
-            data_file.close()
+        fpth = f"data//years//{year}.pkl"
+        if path.exists(fpth):
+            with open(fpth, "rb") as f:
+                cleaned_data = pickle.load(f)
+                f.close()
+        else:
+            print(f'{i+1}. {year}') if print_year else None
+            # customize to your liking 
+            data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
+            data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
+            with open(data_file_path, mode="r") as data_file:
+                data: list = list(csv.reader(data_file, delimiter=','))
+                data_file.close()
 
-        processed_data = setup_data(data)
-        cleaned_data = create_dataset(processed_data, KpDict)
+            processed_data = setup_data(data)
+            cleaned_data = create_dataset(processed_data, KpDict)
+
+            with open(fpth, 'wb') as f:
+                pickle.dump(cleaned_data, f)
+                f.close() 
+        
         all_datasets.append(cleaned_data)
     
     return all_datasets
@@ -112,7 +125,7 @@ if __name__ == "__main__":
     # second [0] -> first entry dataset for 2016 [constant_row, training_row]
     # third [1] -> training_row from first dataset for 2016
     # fourth [0] -> kp value fromt training row for first dataset (2016) [1] would be the filtered data
-    dataset = get_training_data()[0]
+    dataset = get_dataset()[0]
     print(np.array([arr[1] for arr in dataset]).reshape(-1, 1))
     
     pass

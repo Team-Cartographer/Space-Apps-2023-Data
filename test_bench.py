@@ -1,7 +1,7 @@
 date_list = {}
 kp_val = {}
 rows = []
-with open('K_p_DATA.dat', mode='r') as file:
+with open('data/historic_kp_data.dat', mode='r') as file:
     for line in file:
         fields = line.strip().split()
         #print(fields[3])

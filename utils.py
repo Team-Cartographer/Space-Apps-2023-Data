@@ -19,3 +19,9 @@ class ObsoleteCodeError(Exception):
     def __init__(self, message="This code is old, does not work, and should not be used"):
         self.message=message
         super().__init__(self.message)
+
+if __name__ == "__main__":
+    import os
+    print(os.path.exists('data//years//2016.pkl'))
+    
+

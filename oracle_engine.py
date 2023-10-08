@@ -1,6 +1,6 @@
 import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+#from tqdm import tqdm
+#import matplotlib.pyplot as plt
 import pandas as pd
 from test_bench import date_list
 from test_bench import time_list
@@ -54,24 +54,17 @@ def quiet_day(date, time, kp_list):
 
     return qdc
 
-tot_qdc = quiet_day(date_list, time_list, kp_val)
-print(tot_qdc)
-
 rows = []
 interval = 10
-def find_kp(x, y, qdc):
-    # with open('C://Users//zhasi//Downloads//dsc_fc_summed_spectra_2023_v01.csv', 'r') as file:
-    #     for line in file:
-    #         fields = line.strip().split()
-    #         # print(fields[3])
-    #         rows.append(fields)
-    # file.close()
-    #
-    # dict = {}
-
+def find_kp(qdc):
     # All that needs to be done is to put the filtered x and y into this algorithm
-    h_val = np.sqrt((x ** 2)+(y ** 2))
-    h_max = np.max(h_val)
+    data = dm.get_dataset()[0]
+    filtered = np.array([arr[2] for arr in data])
+    h_vals = []
+    for i in filtered:
+        h_vals.append(np.sqrt((i[0] ** 2) + (i[1] ** 2)))
+
+    h_max = np.max(h_vals)
     a = (h_max - qdc)/qdc
     k_p = 0.67 * np.log10(a)
     return k_p
@@ -109,3 +102,6 @@ def predict_kp(init_kp, kp_list):
         print("estimated state:", state_estimate[0])
 
     return predicted_kp
+
+if __name__ == '__main__':
+    tot_qdc = quiet_day(date_list, time_list, kp_val)
