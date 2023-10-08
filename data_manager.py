@@ -5,7 +5,7 @@ from utils import *
 from tqdm import tqdm 
 from backup_engine import KalmanFilter3D
 
-year = 2016
+year = 2016 
 data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data"
 data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
 
@@ -18,7 +18,6 @@ with open(data_file_path, mode="r") as data_file:
 def get_datetime(row: int) -> str:
     datetime: str = data[row][0]
     return datetime
-
 
 def get_mag_field_vec(row: int):
     mag_field = np.array([float(data[row][1]), float(data[row][2]), float(data[row][3])])
@@ -57,6 +56,7 @@ def get_data_list(disp_flux: bool) -> list:
     
     return data_list
 
+
 class DataFrame:
     def __init__(self, data_row):
         self.date = self.process_date(data_row[0]) 
@@ -70,8 +70,13 @@ class DataFrame:
         kalman_filter = KalmanFilter3D([self.init_vec[0], self.init_vec[1], self.init_vec[2]])
         self.filtered_vectors = kalman_filter.filter_measurements(self.raw_vectors)
         # len(filtered_vectors) == len(raw_vectors) == 181 
+
+        self.k_dict = self.fill_Kp_values()
+        self.kp = self.k_dict[self.date.__str__()]
         
-        self.obj = [self.date, self.plus3hours, self.raw_vectors, self.filtered_vectors, self.faraday_readings]
+        # the actual DataFrame objects to create. You can access these publically or via DataFrame.get_data_frame()
+        self.constant_obj = [self.date, self.plus3hours, self.raw_vectors, self.faraday_readings]
+        self.training_obj = [self.kp, self.filtered_vectors]
 
     
     def process_date(self, date_string): 
@@ -93,9 +98,24 @@ class DataFrame:
         self.dates.append(self.plus3hours)
         
         return raw_vecs, farad_r
+
+    def fill_Kp_values(self):
+        rows, di = [], {}
+
+        with open('K_p_DATA.dat', mode='r') as f:
+            for line in f:
+                fields = line.strip().split()
+                rows.append(fields)
+                timestr = fields[0] + " " + fields[1]
+                timestamp = self.process_date(timestr[0:len(timestr) - 4])
+                di.update({str(timestamp): int(fields[3][0:1])})
+            
+            f.close()
+
+        return di 
     
     def get_data_frame(self): 
-        return self.obj
+        return self.constant_obj, self.training_obj
     
     def show_data(self):
         import matplotlib.pyplot as plt 
@@ -120,13 +140,14 @@ class DataFrame:
         # Show the plot
         plt.show()
 
+        
+        
 
 if __name__ == "__main__":
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
-
     df = DataFrame(get_data_list(True)[180]) ### every 180 steps you move forward 3 hours ###
-    df.show_data()
+    print(df.get_data_frame)
 
     
 

@@ -3,7 +3,6 @@ import numpy as np
 from tqdm import tqdm  
 import matplotlib.pyplot as plt 
 
-
 def quiet_day(K):
     if (K < 2):
         k_avg = np.mean(K)
