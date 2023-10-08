@@ -63,7 +63,7 @@ def get_training_data(years=1, print_year=False):
     if years > 5:
         raise ValueError # years cannot be greater than 5 until alex finishes kp data calculation 
     
-    rows = []
+    rows, all_datasets = [], []
     KpDict: dict = {}
     with open('K_p_DATA.dat', mode='r') as f:
         for line in f:
@@ -76,7 +76,6 @@ def get_training_data(years=1, print_year=False):
         
         f.close()
     
-    all_datasets = []
 
     for i in range(0, years): 
         year = 2016 + i # DO NOT USE >2022 YET
@@ -100,7 +99,7 @@ if __name__ == "__main__":
     # this file will probably require some changes soon 
 
     # Example usage
-    # x = get_training_data(1)
+    x = get_training_data(1)
     # print(x)
     # indexes, explained -> 
     # first [0] -> all_datasets[0] = dataset for 2016 (first year)

@@ -4,6 +4,7 @@ import torchvision
 from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 
+from tqdm import tqdm 
 import data_manager as dm 
 from utils import *
 
@@ -12,7 +13,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class CustomDataset(Dataset): 
-    def __init__(self, data, transform=None):
+    def __init__(self, data, transform=transforms.ToTensor()):
         self.data = data
         self.transform = transform
 
@@ -42,12 +43,13 @@ class SimpleNN(nn.Module):
         return out
 
 
-input_size: int  # declare this!!!
-hidden_size: int  # declare this!!!
-output_size: int  # declare this!!!
+input_size: int = 647736 # declare this!!!
+hidden_size: int = 20 # declare this!!!
+output_size: int = 181 # declare this!!!
+batch_size: int = 100
 
 model = SimpleNN(input_size, hidden_size, output_size)
-dataset = CustomDataset(data=dm.get_training_data(years=3))
+dataset = CustomDataset(data=dm.get_training_data())
 
 # I have no idea what this does
 criterion = nn.CrossEntropyLoss()  # Example loss function for classification
@@ -78,8 +80,8 @@ test_loader = DataLoader(dataset=test_dataset,
 
 
 # train the nn
-num_epochs = 10  # Number of training epochs. Change this!!!!
-for epoch in range(num_epochs):
+num_epochs = 100  # Number of training epochs. Change this!!!!
+for epoch in tqdm(range(num_epochs), desc="training"):
     for inputs, labels in train_loader:  # Iterate through your training data
         # Zero the gradients
         optimizer.zero_grad()
@@ -108,7 +110,7 @@ total = 0
 model.eval()
 
 with torch.no_grad():
-    for inputs, labels in test_loader:  # Iterate through your testing data
+    for inputs, labels in tqdm(test_loader, desc="iter thru test data"):  # Iterate through your testing data
         outputs = model(inputs)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
@@ -120,12 +122,12 @@ print(f'Test Accuracy: {accuracy:.2f}%')
 
 # Saves and loads
 torch.save(model.state_dict(), 'model.pth')  # Save the model
-model.load_state_dict(torch.load('model.pth'))  # Load the model
+#model.load_state_dict(torch.load('model.pth'))  # Load the model
 
 
 # predictions on new data
-with torch.no_grad():
-    outputs = model(new_data)
+#with torch.no_grad():
+#    outputs = model(new_data)
 
 
 #raise CodeNotWrittenError
