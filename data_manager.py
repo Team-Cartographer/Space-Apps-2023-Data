@@ -58,6 +58,7 @@ def create_dataset(data, kpData):
 
     return dataset
 
+
 def get_training_data(years=1, print_year=False):
     rows = []
     KpDict: dict = {}
@@ -75,7 +76,7 @@ def get_training_data(years=1, print_year=False):
     all_datasets = []
 
     for i in range(0, years): 
-        year = 2016 + i # DO NOT USE >2022 YET 
+        year = 2016 + i # DO NOT USE >2022 YET
         print(f'{i+1}. {year}') if print_year else None
         # customize to your liking 
         data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
@@ -102,6 +103,6 @@ if __name__ == "__main__":
     # first [0] -> all_datasets[0] = dataset for 2016 (first year)
     # second [0] -> first dataset for 2016 [constant_row, training_row]
     # third [1] -> training_row from first dataset for 2016
-    # fourth [0] -> kp value fromt training row for first dataset (2016) 
+    # fourth [0] -> kp value fromt training row for first dataset (2016)
 
     pass

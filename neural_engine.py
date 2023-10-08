@@ -10,6 +10,7 @@ from utils import *
 pkl_path = "dataset.pkl"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class CustomDataset(Dataset): 
     def __init__(self, data, transform=None):
         self.data = data
@@ -69,7 +70,7 @@ test_dataset = torchvision.datasets.MNIST(root="./data",
 # Data loaders
 train_loader = DataLoader(dataset=dataset,
                           batch_size=batch_size,
-                          shuffle=True)  # I have no clue what shuffle does here. I am copying verbatim off the tutorial
+                          shuffle=True)
 
 test_loader = DataLoader(dataset=test_dataset,
                          batch_size=batch_size,

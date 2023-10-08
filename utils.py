@@ -31,6 +31,7 @@ class CodeNotWrittenError(Exception):
         self.message = message
         super().__init__(self.message)
 
+
 class NoExampleError(Exception):
     def __init__(self, message="There is no example usage for this code here"):
         self.message = message

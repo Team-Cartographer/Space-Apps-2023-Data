@@ -11,6 +11,8 @@ from test_bench import di
 print(len(date_list))
 print(len(time_list))
 print(len(kp_val))
+
+
 def quiet_day(date, time, kp_list):
     sum = 0
     itms = 0
@@ -32,8 +34,10 @@ def quiet_day(date, time, kp_list):
 
     return quiet_day_list
 
+
 tot_qdc = quiet_day(date_list, time_list, kp_val)
 print(tot_qdc)
+
 
 def find_kp(x, y, qdc, _C):
     h_val = np.sqrt((x ** 2)+(y ** 2))
