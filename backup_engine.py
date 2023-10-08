@@ -1,6 +1,7 @@
 from utils import *
 import numpy as np
 import data_manager as dm
+import time 
 from tqdm import tqdm  
 import matplotlib.pyplot as plt 
 
@@ -11,80 +12,70 @@ def quiet_day(self, K):
     qdc = np.mean(k_norm)
     return k_norm
 
-def h_max(self, ):
+def h_max(self):
+    pass
 
+class KalmanFilter3D:
+    def __init__(self, initial_state):
+        # Initialize state variables as numpy arrays
+        self.state_estimate = np.array(initial_state)
+        self.estimate_error = np.eye(3)  # Initial estimate error covariance matrix (3x3)
+        self.measurement_noise = np.eye(3)  # Measurement noise covariance matrix (3x3)
+        self.process_noise = np.eye(3) * 0.05  # Process noise covariance matrix (3x3)
 
+    def predict(self):
+        # Prediction Step
+        predicted_state = self.state_estimate
+        predicted_estimate_error = self.estimate_error + self.process_noise
+        return predicted_state, predicted_estimate_error
 
+    def update(self, measurement):
+        # Update Step
+        predicted_state, predicted_estimate_error = self.predict()
+        kalman_gain = np.dot(predicted_estimate_error, np.linalg.inv(predicted_estimate_error + self.measurement_noise))
+        self.state_estimate = predicted_state + np.dot(kalman_gain, (measurement - predicted_state))
+        self.estimate_error = np.dot((np.eye(3) - kalman_gain), predicted_estimate_error)
 
-
-# class KalmanFilter:
-#     def __init__(self, init_m, second_m):
-#         pass
-    
-#     def filter_dataset(self):
-#         pass
-
-# class LowPassFilter: 
-#     def __init__(self):
-#         pass
-
-# class MovingAvgFilter:
-#     def __init__(self):
-#         pass
-class KalmanFilter:
-    def __init__(self):
-        raise CodeNotWrittenError
-
-    def kalman_filter(initial_state, initial_estimate_error, measurement_noise, process_noise, measurements):
-        # Initialize state variables
-        state_estimate = initial_state
-        estimate_error = initial_estimate_error
-
+    def filter_measurements(self, measurements):
         filtered_states = []
+        last_valid = []
 
-        for measurement in tqdm(measurements, desc="Filtering Data"):
-            # Prediction Step
-            predicted_state = state_estimate
-            predicted_estimate_error = estimate_error + process_noise
+        for measurement in tqdm(measurements, desc="Filtering data"):
+            if np.all(np.isnan(measurement)):
+                filtered_states.append(last_valid[len(last_valid) - 1])
+            else:
+                self.update(measurement)
+                last_valid.append(self.state_estimate)
+                filtered_states.append(self.state_estimate)
 
-            # Update Step
-            kalman_gain = np.dot(predicted_estimate_error, np.linalg.inv(predicted_estimate_error + measurement_noise))
-            state_estimate = predicted_state + np.dot(kalman_gain, (measurement - predicted_state))
-            estimate_error = np.dot((np.eye(len(initial_state)) - kalman_gain), predicted_estimate_error)
+        return np.array(filtered_states)
 
-            filtered_states.append(state_estimate)
 
-        return filtered_states
+if __name__ == "__main__":
+    # Example Usage 
+    data = [np.array(dm.get_mag_field_vec(x)) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
+    filt = KalmanFilter3D([data[0][0], data[0][1], data[0][2]])
+    filtered = filt.filter_measurements(data)
 
-    # Example usage
-    if __name__ == "__main__":
-        # Simulated measurements (3D vectors)
-        measurements = [dm.get_mag_field_vec(x) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
-        dates = [dm.get_datetime(x) for x in tqdm(range(len(dm.data)), desc="Getting Dates")]
+    # fig, ax1 = plt.subplots()
+    # x = range(500)
 
-        initial_state = np.array([measurements[12000][0], measurements[12000][1], measurements[12000][2]])  # Initial state estimate (3D vector)
-        initial_estimate_error = np.eye(3)  # Initial estimate error covariance matrix (3x3)
-        measurement_noise = np.eye(3)  # Measurement noise covariance matrix (3x3)
-        process_noise = np.eye(3) * 0.05  # Process noise covariance matrix (3x3)
+    # # Plot the first data on the first Y-axis (left)
+    # ax1.plot(x, data[0:500], color='tab:blue')
+    # ax1.set_xlabel('X-axis')
+    # ax1.set_ylabel('Y1-axis', color='tab:blue')
 
-        filtered_states = kalman_filter(initial_state, initial_estimate_error, measurement_noise, process_noise, measurements)
+    # # Create a second set of Y-axes that shares the same X-axis
+    # ax2 = ax1.twinx()
 
-        fig, ax1 = plt.subplots()
+    # # Plot the second data on the second Y-axis (right)
+    # ax2.plot(x, filtered[0:500], color='tab:red')
+    # ax2.set_ylabel('Y2-axis', color='tab:red')
 
-        # Plot the first data on the first Y-axis (left)
-        ax1.plot(dates[12000:13000], measurements[12000:13000], color='tab:blue')
-        ax1.set_xlabel('X-axis')
-        ax1.set_ylabel('Y1-axis', color='tab:blue')
+    # # Add a title
+    # plt.title('Graph')
 
-        # Create a second set of Y-axes that shares the same X-axis
-        ax2 = ax1.twinx()
+    # # Show the plot
+    # plt.show()
 
-        # Plot the second data on the second Y-axis (right)
-        ax2.plot(dates[12000:13000], filtered_states[12000:13000], color='tab:red')
-        ax2.set_ylabel('Y2-axis', color='tab:red')
 
-        # Add a title
-        plt.title('Graph')
-
-        # Show the plot
-        plt.show()
