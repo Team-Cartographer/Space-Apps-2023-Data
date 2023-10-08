@@ -3,9 +3,9 @@ import numpy as np
 from tqdm import tqdm  
 import matplotlib.pyplot as plt
 import pandas as pd
-import test_bench
-from test_bench import di
-import data_manager as dm
+#import test_bench
+#from test_bench import di
+#import data_manager as dm
 
 def quiet_day(kp_list):
     sum = 0
@@ -20,8 +20,8 @@ def quiet_day(kp_list):
 
     return qdc
 
-tot_qdc = quiet_day(di)
-print(tot_qdc)
+#tot_qdc = quiet_day(di)
+#print(tot_qdc)
 
 def find_kp(x, y, qdc, _C):
     h_val = np.sqrt((x ** 2)+(y ** 2))
@@ -55,7 +55,7 @@ class KalmanFilter3D:
         filtered_states = []
         last_valid = []
 
-        for measurement in measurements:
+        for measurement in tqdm(measurements, desc="Filtering Data"):
             if np.all(np.isnan(measurement)):
                 try:
                     filtered_states.append(last_valid[len(last_valid) - 1])

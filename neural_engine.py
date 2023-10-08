@@ -22,7 +22,7 @@ class CustomDataset(Dataset):
             data_list = dm.get_data_list(disp_flux=True)
             iters = int(len(data_list)/180)
             for i in tqdm(range(iters), desc="Developing the Dataset"):
-                df = DataFrame(data_list[i * 180], dm.KpDict)
+                df = DataFrame(i, dm.KpDict)
                 constants, trainers = df.get_data_frame()
                 self.data.append([constants, trainers])
             with open(pkl_path, 'wb') as f:

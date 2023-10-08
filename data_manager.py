@@ -4,162 +4,95 @@ from datetime import datetime, timedelta
 from utils import * 
 from tqdm import tqdm 
 from backup_engine import KalmanFilter3D
-from concurrent.futures import ProcessPoolExecutor
 
-year = 2016 
-data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data"
-data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
+@timeit
+def setup_data(data) -> np.ndarray:
+    dtype = [('datetime', 'U19'), ('mag_field', '3f8'), ('flux_measurements', '49f8')]
 
-# access the data (for now, change this to your local data location) 
-with open(data_file_path, mode="r") as data_file:
-    data: list = list(csv.reader(data_file, delimiter=','))
-    data_file.close()
+    data_array = np.empty(len(data), dtype=dtype)
 
-# access the Kp data
-rows = []
-KpDict: dict = {}
-with open('K_p_DATA.dat', mode='r') as f:
-    for line in f:
-        fields = line.strip().split()
-        rows.append(fields)
-        frmt = "%Y-%m-%d %H:%M:%S"
-        timestr = fields[0] + " " + fields[1]
-        timestamp = datetime.strptime(timestr[0:len(timestr) - 4], frmt)
-        KpDict.update({str(timestamp): int(fields[3][0:1])})
-    
-    f.close()
-# ----------------
+    for i in tqdm(range(len(data)), desc="Compiling Data"):
+        datetime = data[i][0]
+        mag_field = np.array([float(data[i][1]), float(data[i][2]), float(data[i][3])], dtype=np.float64)
+        flux_measurements = [float(data[i][x]) for x in range(4, 53)]
+        flux_measurements = [np.nan if measurement == 0 else measurement for measurement in flux_measurements]
 
-# @timeit
-# def process_dataset():
-    
+        row_data = (datetime, mag_field, flux_measurements)
 
-def get_datetime(row: int) -> str:
-    datetime: str = data[row][0]
-    return datetime
+        data_array[i] = row_data
 
-def get_mag_field_vec(row: int):
-    mag_field = np.array([float(data[row][1]), float(data[row][2]), float(data[row][3])])
-    return mag_field
-
-def get_mag_vec_from_list(lis: list):
-    mag_field = np.array([float(lis[1]), float(lis[2]), float(lis[3])])
-    return mag_field
-
-def get_flux_measurements(row: int) -> list:
-    flux_measurements: list = [float(data[row][x]) for x in range(4, 53)]
-    flux_measurements = ["NaN" if measurement == 0 else measurement for measurement in flux_measurements]
-
-    return flux_measurements
-
-def get_flux_from_list(lis: list) -> list:
-    flux_measurements: list = [float(lis[x]) for x in range(4, 53)]
-    flux_measurements = ["NaN" if measurement == 0 else measurement for measurement in flux_measurements]
-
-    return flux_measurements
+    return data_array
 
 
-def get_data_object(row: int, display_flux: bool) -> list:  # add additional proper type hinting later
-    data_object: list  # add additional typing later
-    if display_flux:
-        data_object = [get_datetime(row), get_mag_field_vec(row), get_flux_measurements(row)] 
-    else:
-        data_object = [get_datetime(row), get_mag_field_vec(row)]
-    
-    return data_object
+@timeit
+def create_dataset(data, kpData):
+    first_reading = data['mag_field'][0]
+    filt = KalmanFilter3D([first_reading[0], first_reading[1], first_reading[2]])
+    filtered_data = filt.filter_measurements(data['mag_field'])
+    dataset = []
+    temp_row = []
 
-def get_data_list(disp_flux: bool) -> list:
-    data_list = []
-    for i in tqdm(range(len(data)), desc="Compiling Data"): 
-        data_list.append(get_data_object(i, display_flux=disp_flux))
-    
-    return data_list
+    for i in tqdm(range(len(data)), desc="Crunching Numbers"): 
+        if i % 180 == 0: # 3 hour gap every 180 points  
+            dataset.append(temp_row) if i != 0 else None 
+            temp_row = []
 
+            start_time = data['datetime'][i]
+            start_date = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+            end_time = (start_date + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S")
+            kp_value = kpData[start_date.strftime("%Y-%m-%d %H:%M:%S")]
 
-class DataFrame:
-    def __init__(self, data_row, kpData):
-        self.date = self.process_date(data_row[0]) 
-        self.plus3hours = self.date + timedelta(hours=3)
-        self.dates = [self.date]
+            temp_row.append(start_time)
+            temp_row.append(end_time)
+            temp_row.append(kp_value)
+            temp_row.append([]) # raw mag field
+            temp_row.append([]) # filtered mag field 
+            temp_row.append([]) # faraday data
+        else: 
+            temp_row[3].append(data['mag_field'][i])
+            temp_row[4].append(filtered_data[i])
+            temp_row[5].append(data['flux_measurements'][i])
 
-        self.raw_vectors, self.faraday_readings = self.fill_raws()
-        self.filtered_vectors = []
+    return dataset
 
-        self.init_vec = self.raw_vectors[0]
-        kalman_filter = KalmanFilter3D([self.init_vec[0], self.init_vec[1], self.init_vec[2]])
-        self.filtered_vectors = kalman_filter.filter_measurements(self.raw_vectors)
-        # len(filtered_vectors) == len(raw_vectors) == 181 
-
-        self.kp = kpData[self.date.__str__()]
-        
-        # the actual DataFrame objects to create. You can access these publically or via DataFrame.get_data_frame()
-        self.constant_obj = [self.date, self.plus3hours, self.raw_vectors, self.faraday_readings]
-        self.training_obj = [self.kp, self.filtered_vectors]
-
-    
-    def process_date(self, date_string): 
-        date_format = "%Y-%m-%d %H:%M:%S"
-        date_object = datetime.strptime(date_string, date_format)
-        return date_object
-    
-    def fill_raws(self):
-        # raw_vecs = []
-        # farad_r = []
-        # for row in data:
-        #     date = self.process_date(row[0])
-        #     if(self.date <= date <= self.plus3hours):
-        #         self.dates.append(date)
-        #         vecs = np.array(get_mag_vec_from_list(row))
-        #         raw_vecs.append(vecs)
-        #         farad_r = get_flux_from_list(row)
-        
-        # self.dates.append(self.plus3hours)
-        
-        # return raw_vecs, farad_r
-        date_objects = [self.process_date(row[0]) for row in data]
-        mask = (self.date <= date_objects) & (date_objects <= self.plus3hours)
-        self.dates = np.concatenate([self.dates, date_objects[mask], self.plus3hours])
-        raw_vecs = np.array([get_mag_vec_from_list(row) for row in data[mask]])
-        farad_r = np.array([get_flux_from_list(row) for row in data[mask]])
-        return raw_vecs, farad_r
-    
-    def get_data_frame(self): 
-        return self.constant_obj, self.training_obj
-    
-    def show_data(self):
-        import matplotlib.pyplot as plt 
-        fig, ax1 = plt.subplots()
-        x = self.dates[1:len(self.dates)-1]
-
-        # Plot the first data on the first Y-axis (left)
-        ax1.plot(x, self.raw_vectors, color='tab:gray')
-        ax1.set_xlabel('3 Hours')
-        ax1.set_ylabel('Raw Vectors', color='tab:gray')
-
-        # Create a second set of Y-axes that shares the same X-axis
-        ax2 = ax1.twinx()
-
-        # Plot the second data on the second Y-axis (right)
-        ax2.plot(x, self.filtered_vectors, color='000000')
-        ax2.set_ylabel('Filtered Vectors', color='000000')
-
-        # Add a title
-        plt.title(f'Vectors for 3 Hours from {self.date} to {self.plus3hours}')
-
-        # Show the plot
-        plt.show()
-
-        
-        
 
 if __name__ == "__main__":
-    print(process_dataset())
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
-    #df = DataFrame(get_data_list(True)[180]) ### every 180 steps you move forward 3 hours ###
-    #print(get_data_list(True)[180][1][2])
-    #print(df.get_data_frame)
 
+    # get Kp values 
+    rows = []
+    KpDict: dict = {}
+    with open('K_p_DATA.dat', mode='r') as f:
+        for line in f:
+            fields = line.strip().split()
+            rows.append(fields)
+            frmt = "%Y-%m-%d %H:%M:%S"
+            timestr = fields[0] + " " + fields[1]
+            timestamp = datetime.strptime(timestr[0:len(timestr) - 4], frmt)
+            KpDict.update({str(timestamp): int(fields[3][0:1])})
+        
+        f.close()
     
+    all_datasets = []
+
+    # get yearly data values 
+    for i in range(0, 1): 
+        year = 2016 + i # DO NOT USE >2022 YET 
+        print(year)
+        # customize to your liking 
+        data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
+        data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
+        with open(data_file_path, mode="r") as data_file:
+            data: list = list(csv.reader(data_file, delimiter=','))
+            data_file.close()
+
+        processed_data = setup_data(data)
+        cleaned_data = create_dataset(processed_data, KpDict)
+        all_datasets.append(cleaned_data)
+    
+    print(all_datasets[0][0][0]) # "2016-01-01 00:00:00"
+
+
 
     
