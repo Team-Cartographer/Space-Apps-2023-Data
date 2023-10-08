@@ -69,6 +69,7 @@ class DataFrame:
         self.init_vec = self.raw_vectors[0]
         kalman_filter = KalmanFilter3D([self.init_vec[0], self.init_vec[1], self.init_vec[2]])
         self.filtered_vectors = kalman_filter.filter_measurements(self.raw_vectors)
+        # len(filtered_vectors) == len(raw_vectors) == 181 
         
         self.obj = [self.date, self.plus3hours, self.raw_vectors, self.filtered_vectors, self.faraday_readings]
 
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
 
-    df = DataFrame(get_data_list(True)[0]) ## every 180 steps you move forward 3 hours 
+    df = DataFrame(get_data_list(True)[180]) ### every 180 steps you move forward 3 hours ###
     df.show_data()
 
     
