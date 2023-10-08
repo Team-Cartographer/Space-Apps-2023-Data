@@ -59,6 +59,9 @@ def create_dataset(data, kpData):
     return dataset
 
 def get_training_data(years=1, print_year=False):
+    if years > 5:
+        raise ValueError # years cannot be greater than 5 until alex finishes kp data calculation 
+    
     rows = []
     KpDict: dict = {}
     with open('K_p_DATA.dat', mode='r') as f:
@@ -96,12 +99,12 @@ if __name__ == "__main__":
     # this file will probably require some changes soon 
 
     # Example usage
-    # x = get_training_data(1)[0][0][1][0] 
+    x = get_training_data(1)
     # print(x)
     # indexes, explained -> 
     # first [0] -> all_datasets[0] = dataset for 2016 (first year)
-    # second [0] -> first dataset for 2016 [constant_row, training_row]
+    # second [0] -> first entry dataset for 2016 [constant_row, training_row]
     # third [1] -> training_row from first dataset for 2016
-    # fourth [0] -> kp value fromt training row for first dataset (2016) 
+    # fourth [0] -> kp value fromt training row for first dataset (2016) [1] would be the filtered data
 
     pass
