@@ -1,7 +1,6 @@
 from utils import *
 import numpy as np
 import data_manager as dm
-import time 
 from tqdm import tqdm  
 import matplotlib.pyplot as plt 
 
@@ -14,6 +13,13 @@ def quiet_day(K):
 
 def h_max(self):
     pass
+
+def find_kp(x, y, qdc, _C):
+    h_val = np.sqrt((x ** 2)+(y ** 2))
+    h_max = np.max(h_val)
+    a = (h_max - qdc)/qdc
+    k_p = 0.67 * np.log10(a) + _C
+    return k_p
 
 class KalmanFilter3D:
     def __init__(self, initial_state):
