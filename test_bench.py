@@ -30,7 +30,9 @@ for key in di.keys():
     print(date)
     print(time)
 
-kp_list = list(di.values())
+kp_list = []
+kp_val = di.values()
+print(kp_val)
 
 
 
