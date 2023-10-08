@@ -1,7 +1,7 @@
 date_list = {}
 kp_val = {}
 rows = []
-with open('C://Users//zhasi//Downloads//isgi_data_1696720276_541747//Kp_2016-01-01_2021-12-31_D.dat', mode='r') as file:
+with open('Kp_2016-01-01_2021-12-31_D.dat', mode='r') as file:
     for line in file:
         fields = line.strip().split()
         #print(fields[3])
