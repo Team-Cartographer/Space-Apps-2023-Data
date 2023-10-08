@@ -86,14 +86,13 @@ def predict_kp(init_kp, kp_list):
     initial_state_covariance = np.array([1.0])
     initial_state = np.array([init_kp])
 
-    A = np.array([1.0])  # State transition matrix
-    B = np.array([1.0])  # Control input matrix (if applicable)
-    H = np.array([1.0])  # Measurement matrix
+    A = np.array([1.0])
+    B = np.array([1.0])
+    H = np.array([1.0])
 
-    Q = np.array([0.01])  # Process noise covariance
-    R = np.array([0.1])  # Measurement noise covariance
+    Q = np.array([0.01])
+    R = np.array([0.1])
 
-    # Initialize state estimate and state covariance
     state_estimate = initial_state
     state_covariance = initial_state_covariance
 
