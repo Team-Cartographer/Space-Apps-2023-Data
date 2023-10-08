@@ -6,6 +6,7 @@ from test_bench import date_list
 from test_bench import time_list
 from test_bench import kp_val
 from test_bench import di
+import data_manager as dm
 
 
 ## print(len(date_list))
@@ -53,14 +54,30 @@ def quiet_day(date, time, kp_list):
 
     return qdc
 
-
 tot_qdc = quiet_day(date_list, time_list, kp_val)
 print(tot_qdc)
 
+rows = []
+interval = 10
+def find_kp(x, y, qdc):
+    # with open('C://Users//zhasi//Downloads//dsc_fc_summed_spectra_2023_v01.csv', 'r') as file:
+    #     for line in file:
+    #         fields = line.strip().split()
+    #         # print(fields[3])
+    #         rows.append(fields)
+    # file.close()
+    #
+    # dict = {}
 
-def find_kp(x, y, qdc, _c):
+    # All that needs to be done is to put the filtered x and y into this algorithm
     h_val = np.sqrt((x ** 2)+(y ** 2))
     h_max = np.max(h_val)
     a = (h_max - qdc)/qdc
-    k_p = 0.67 * np.log10(a) + _c
+    k_p = 0.67 * np.log10(a)
     return k_p
+
+# testing = find_kp(tot_qdc)
+#
+# final_kp = find_kp(testing)
+#
+# print(final_kp)
