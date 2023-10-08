@@ -81,3 +81,32 @@ def find_kp(x, y, qdc):
 # final_kp = find_kp(testing)
 #
 # print(final_kp)
+
+def predict_kp(init_kp, kp_list):
+    initial_state_covariance = np.array([1.0])
+    initial_state = np.array([init_kp])
+
+    A = np.array([1.0])  # State transition matrix
+    B = np.array([1.0])  # Control input matrix (if applicable)
+    H = np.array([1.0])  # Measurement matrix
+
+    Q = np.array([0.01])  # Process noise covariance
+    R = np.array([0.1])  # Measurement noise covariance
+
+    # Initialize state estimate and state covariance
+    state_estimate = initial_state
+    state_covariance = initial_state_covariance
+
+    for kp in kp_list:
+        # prediction step
+        predicted_kp = np.dot(A, state_estimate)
+        predicted_state_covariance = np.dot(A, state_covariance)
+
+        # update step
+        kalman_gain = predicted_state_covariance / (predicted_state_covariance + R)
+        state_estimate = predicted_kp + kalman_gain * (kp_list - np.dot(H, predicted_kp))
+        state_covariance = (1-kalman_gain) * predicted_state_covariance
+
+        print("estimated state:", state_estimate[0])
+
+    return predicted_kp
