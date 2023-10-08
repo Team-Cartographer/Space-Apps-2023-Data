@@ -13,7 +13,7 @@ if not path.exists(venv_folder):
     print("Installing dependencies...")
 
     # Add pip installation names here for any new package.
-    packages = ["numpy", "torch", "torchvision"]
+    packages = ["numpy", "torch", "torchvision", "tensorflow"]
     for package in packages:
         run([sys.executable, "-m", "pip", "install", package], check=True)
         print(f"Installed package: {package}")
