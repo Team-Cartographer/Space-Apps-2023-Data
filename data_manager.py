@@ -1,6 +1,5 @@
-import csv 
 import numpy as np
-
+import csv 
 from datetime import datetime, timedelta
 from utils import * 
 from tqdm import tqdm 
@@ -22,12 +21,21 @@ def get_datetime(row: int) -> str:
 
 
 def get_mag_field_vec(row: int):
-    mag_field = [float(data[row][1]), float(data[row][2]), float(data[row][3])]
+    mag_field = np.array([float(data[row][1]), float(data[row][2]), float(data[row][3])])
     return mag_field
 
+def get_mag_vec_from_list(lis: list):
+    mag_field = np.array([float(lis[1]), float(lis[2]), float(lis[3])])
+    return mag_field
 
 def get_flux_measurements(row: int) -> list:
     flux_measurements: list = [float(data[row][x]) for x in range(4, 53)]
+    flux_measurements = ["NaN" if measurement == 0 else measurement for measurement in flux_measurements]
+
+    return flux_measurements
+
+def get_flux_from_list(lis: list) -> list:
+    flux_measurements: list = [float(lis[x]) for x in range(4, 53)]
     flux_measurements = ["NaN" if measurement == 0 else measurement for measurement in flux_measurements]
 
     return flux_measurements
@@ -50,10 +58,10 @@ def get_data_list(disp_flux: bool) -> list:
     return data_list
 
 class DataFrame:
-    @timeit
     def __init__(self, data_row):
         self.date = self.process_date(data_row[0]) 
         self.plus3hours = self.date + timedelta(hours=3)
+        self.dates = [self.date]
 
         self.raw_vectors, self.faraday_readings = self.fill_raws()
         self.filtered_vectors = []
@@ -75,21 +83,50 @@ class DataFrame:
         farad_r = []
         for row in data:
             date = self.process_date(row[0])
-            if(self.date < date < self.plus3hours):
-                raw_vecs.append(row[1])
-                farad_r.append(row[2])
+            if(self.date <= date <= self.plus3hours):
+                self.dates.append(date)
+                vecs = np.array(get_mag_vec_from_list(row))
+                raw_vecs.append(vecs)
+                farad_r = get_flux_from_list(row)
+        
+        self.dates.append(self.plus3hours)
         
         return raw_vecs, farad_r
     
     def get_data_frame(self): 
         return self.obj
+    
+    def show_data(self):
+        import matplotlib.pyplot as plt 
+        fig, ax1 = plt.subplots()
+        x = self.dates[1:len(self.dates)-1]
+
+        # Plot the first data on the first Y-axis (left)
+        ax1.plot(x, self.raw_vectors, color='tab:gray')
+        ax1.set_xlabel('3 Hours')
+        ax1.set_ylabel('Raw Vectors', color='tab:gray')
+
+        # Create a second set of Y-axes that shares the same X-axis
+        ax2 = ax1.twinx()
+
+        # Plot the second data on the second Y-axis (right)
+        ax2.plot(x, self.filtered_vectors, color='000000')
+        ax2.set_ylabel('Filtered Vectors', color='000000')
+
+        # Add a title
+        plt.title(f'Vectors for 3 Hours from {self.date} to {self.plus3hours}')
+
+        # Show the plot
+        plt.show()
 
 
 if __name__ == "__main__":
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
 
-    df = DataFrame(get_data_list(True)[0])
-    print(df.get_data_frame())
+    df = DataFrame(get_data_list(True)[0]) ## every 180 steps you move forward 3 hours 
+    df.show_data()
+
+    
 
     
