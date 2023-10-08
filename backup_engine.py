@@ -1,10 +1,6 @@
 from utils import *
 import numpy as np
 from tqdm import tqdm  
-import matplotlib.pyplot as plt
-import pandas as pd
-import data_manager as dm
-
 
 class KalmanFilter3D:
     def __init__(self, initial_state):
@@ -46,32 +42,6 @@ class KalmanFilter3D:
 
 
 if __name__ == "__main__":
-    pass
-
-    # Example Usage (doesn't work coz of circular import)
-    data = [np.array(dm.get_mag_field_vec(x)) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
-    filt = KalmanFilter3D([data[0][0], data[0][1], data[0][2]])
-    filtered = filt.filter_measurements(data)
-
-    fig, ax1 = plt.subplots()
-    x = range(500)
-
-    # # Plot the first data on the first Y-axis (left)
-    ax1.plot(x, data[0:500], color='tab:blue')
-    ax1.set_xlabel('X-axis')
-    ax1.set_ylabel('Y1-axis', color='tab:blue')
-
-    # # Create a second set of Y-axes that shares the same X-axis
-    ax2 = ax1.twinx()
-
-    # # Plot the second data on the second Y-axis (right)
-    ax2.plot(x, filtered[0:500], color='tab:red')
-    ax2.set_ylabel('Y2-axis', color='tab:red')
-
-    # Add a title
-    plt.title('Graph')
-
-    # Show the plot
-    plt.show()
+    raise NoExampleError
 
 

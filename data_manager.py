@@ -30,32 +30,35 @@ def create_dataset(data, kpData):
     filt = KalmanFilter3D([first_reading[0], first_reading[1], first_reading[2]])
     filtered_data = filt.filter_measurements(data['mag_field'])
     dataset = []
-    temp_row = []
+    temp_constant_row = []
+    temp_training_row = []
 
-    for i in tqdm(range(len(data)), desc="Crunching Numbers"): 
+    for i in tqdm(range(len(data)), desc="Building Dataset"): 
         if i % 180 == 0: # 3 hour gap every 180 points  
-            dataset.append(temp_row) if i != 0 else None 
-            temp_row = []
+            dataset.append([temp_constant_row, temp_training_row]) if i != 0 else None 
+            temp_constant_row, temp_training_row = [], []
 
             start_time = data['datetime'][i]
             start_date = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
             end_time = (start_date + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S")
             kp_value = kpData[start_date.strftime("%Y-%m-%d %H:%M:%S")]
 
-            temp_row.append(start_time)
-            temp_row.append(end_time)
-            temp_row.append(kp_value)
-            temp_row.append([]) # raw mag field
-            temp_row.append([]) # filtered mag field 
-            temp_row.append([]) # faraday data
+            temp_constant_row.append(start_time)
+            temp_constant_row.append(end_time)
+            temp_constant_row.append([]) # raw mag field
+            temp_constant_row.append([]) # faraday data
+
+            temp_training_row.append(kp_value)
+            temp_training_row.append([]) # filtered mag field 
         else: 
-            temp_row[3].append(data['mag_field'][i])
-            temp_row[4].append(filtered_data[i])
-            temp_row[5].append(data['flux_measurements'][i])
+            temp_constant_row[2].append(data['mag_field'][i])
+            temp_constant_row[3].append(data['flux_measurements'][i])
+
+            temp_training_row[1].append(filtered_data[i])
 
     return dataset
 
-def get_training_data(years=1):
+def get_training_data(years=1, print_year=False):
     rows = []
     KpDict: dict = {}
     with open('K_p_DATA.dat', mode='r') as f:
@@ -73,7 +76,7 @@ def get_training_data(years=1):
 
     for i in range(0, years): 
         year = 2016 + i # DO NOT USE >2022 YET 
-        print(year)
+        print(f'{i+1}. {year}') if print_year else None
         # customize to your liking 
         data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
         data_file_path: str = data_folder_path + f"//dsc_fc_summed_spectra_{year}_v01.csv"
@@ -93,5 +96,12 @@ if __name__ == "__main__":
     # this file will probably require some changes soon 
 
     # Example usage
-    # x = get_training_data(2)
+    # x = get_training_data(1)[0][0][1][0] 
+    # print(x)
+    # indexes, explained -> 
+    # first [0] -> all_datasets[0] = dataset for 2016 (first year)
+    # second [0] -> first dataset for 2016 [constant_row, training_row]
+    # third [1] -> training_row from first dataset for 2016
+    # fourth [0] -> kp value fromt training row for first dataset (2016) 
+
     pass

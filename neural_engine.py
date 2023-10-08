@@ -4,9 +4,6 @@ import torchvision
 from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 
-from tqdm import tqdm 
-import pickle
-import os
 import data_manager as dm 
 from utils import *
 
