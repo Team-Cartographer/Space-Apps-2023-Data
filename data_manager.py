@@ -100,7 +100,7 @@ if __name__ == "__main__":
     # this file will probably require some changes soon 
 
     # Example usage
-    x = get_training_data(1)
+    # x = get_training_data(1)
     # print(x)
     # indexes, explained -> 
     # first [0] -> all_datasets[0] = dataset for 2016 (first year)
