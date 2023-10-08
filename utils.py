@@ -36,3 +36,9 @@ class NoExampleError(Exception):
     def __init__(self, message="There is no example usage for this code here"):
         self.message = message
         super().__init__(self.message)
+
+
+class ObsoleteCodeError(Exception):
+    def __init__(self, message="This code is old, does not work, and should not be used"):
+        self.message=message
+        super().__init__(self.message)
