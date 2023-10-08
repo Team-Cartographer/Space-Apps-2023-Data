@@ -39,7 +39,7 @@ train_dataset = torchvision.datasets.MNIST(root="./data",
                                            transform=transforms.ToTensor(),
                                            download=True)
 
-test_dataset = torch.datasets.MNIST(root="./data",
+test_dataset = torchvision.datasets.MNIST(root="./data",
                                     train=True,
                                     transform=transforms.ToTensor(),
                                     download=True)
@@ -57,7 +57,7 @@ test_loader = DataLoader(dataset=test_dataset,
 # train the nn
 num_epochs = 10  # Number of training epochs. Change this!!!!
 for epoch in range(num_epochs):
-    for inputs, labels in dataloader:  # Iterate through your training data
+    for inputs, labels in train_loader:  # Iterate through your training data
         # Zero the gradients
         optimizer.zero_grad()
 
@@ -85,7 +85,7 @@ total = 0
 model.eval()
 
 with torch.no_grad():
-    for inputs, labels in test_loader:
+    for inputs, labels in test_loader:  # Iterate through your testing data
         outputs = model(inputs)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
@@ -105,4 +105,4 @@ with torch.no_grad():
     outputs = model(new_data)
 
 
-raise CodeNotWrittenError
+#raise CodeNotWrittenError
