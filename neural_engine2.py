@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     with open(csv_name, "w", newline="\n") as f:
         for prediction in kp_predictions:
-            f.write(f"{np.ceil(prediction)}")
+            f.write(f"{int(np.ceil(prediction))},")
 
     print(f'Predicted Kp written to {csv_name}".')
 

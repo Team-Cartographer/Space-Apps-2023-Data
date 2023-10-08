@@ -1,6 +1,6 @@
 import numpy as np
-#from tqdm import tqdm
-#import matplotlib.pyplot as plt
+from tqdm import tqdm
+import csv
 import pandas as pd
 from test_bench import date_list
 from test_bench import time_list
@@ -89,9 +89,9 @@ def predict_kp(init_kp, kp_list):
     state_estimate = initial_state
     state_covariance = initial_state_covariance
 
-    for kp in kp_list:
+    for kp in tqdm(kp_list[len(kp_list)-20:], desc="Predicting State"):
         # prediction step
-        predicted_kp = np.dot(A, state_estimate)
+        predicted_kp = np.dot(A, kp)
         predicted_state_covariance = np.dot(A, state_covariance)
 
         # update step
@@ -99,9 +99,22 @@ def predict_kp(init_kp, kp_list):
         state_estimate = predicted_kp + kalman_gain * (kp_list - np.dot(H, predicted_kp))
         state_covariance = (1-kalman_gain) * predicted_state_covariance
 
-        print("estimated state:", state_estimate[0])
+        #print("estimated state:", state_estimate[0])
 
-    return predicted_kp
+    return int(predicted_kp[0])
 
 if __name__ == '__main__':
     tot_qdc = quiet_day(date_list, time_list, kp_val)
+    kp_data = []
+
+    with open('data/preds/predictions.csv', 'r') as f:
+        reader_obj = csv.reader(f, delimiter=",") 
+        for row in reader_obj: 
+            for ele in row: 
+                if ele:
+                    kp_data.append(int(ele[0]))
+    
+    kp_data = np.array(kp_data)
+    init_kp = kp_data[len(kp_data)-20]
+
+    print(predict_kp(init_kp, kp_data))
