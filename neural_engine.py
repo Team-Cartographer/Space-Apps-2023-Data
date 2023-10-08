@@ -8,29 +8,14 @@ from tqdm import tqdm
 import pickle
 import os
 import data_manager as dm 
-from data_manager import DataFrame
 from utils import *
 
 pkl_path = "dataset.pkl"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class CustomDataset(Dataset): 
-    def __init__(self, transform=None):
-        self.data = []
-
-        if not os.path.exists(pkl_path):
-            data_list = dm.get_data_list(disp_flux=True)
-            iters = int(len(data_list)/180)
-            for i in tqdm(range(iters), desc="Developing the Dataset"):
-                df = DataFrame(i, dm.KpDict)
-                constants, trainers = df.get_data_frame()
-                self.data.append([constants, trainers])
-            with open(pkl_path, 'wb') as f:
-                pickle.dump(self.data, f)
-        else:
-            with open(pkl_path, 'rb') as f:
-                self.data = pickle.load(f)
-
+    def __init__(self, data, transform=None):
+        self.data = data
         self.transform = transform
 
     def __len__(self):
@@ -63,8 +48,8 @@ input_size: int  # declare this!!!
 hidden_size: int  # declare this!!!
 output_size: int  # declare this!!!
 
-#model = SimpleNN(input_size, hidden_size, output_size)
-dataset = CustomDataset()
+model = SimpleNN(input_size, hidden_size, output_size)
+dataset = CustomDataset(data=dm.get_training_data(years=3))
 
 # I have no idea what this does
 criterion = nn.CrossEntropyLoss()  # Example loss function for classification

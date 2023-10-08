@@ -55,12 +55,7 @@ def create_dataset(data, kpData):
 
     return dataset
 
-
-if __name__ == "__main__":
-    # in the end, this should gain data from a live source, and then push it out to firebase. 
-    # this file will probably require some changes soon 
-
-    # get Kp values 
+def get_training_data(years=1):
     rows = []
     KpDict: dict = {}
     with open('K_p_DATA.dat', mode='r') as f:
@@ -76,8 +71,7 @@ if __name__ == "__main__":
     
     all_datasets = []
 
-    # get yearly data values 
-    for i in range(0, 1): 
+    for i in range(0, years): 
         year = 2016 + i # DO NOT USE >2022 YET 
         print(year)
         # customize to your liking 
@@ -91,7 +85,14 @@ if __name__ == "__main__":
         cleaned_data = create_dataset(processed_data, KpDict)
         all_datasets.append(cleaned_data)
     
-    print(all_datasets[0][0][0]) # "2016-01-01 00:00:00"
+    return all_datasets
+
+
+if __name__ == "__main__":
+    # in the end, this should gain data from a live source, and then push it out to firebase. 
+    # this file will probably require some changes soon 
+
+    # x = get_training_data(2)
 
 
 
