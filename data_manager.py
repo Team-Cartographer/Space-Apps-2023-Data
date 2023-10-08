@@ -89,11 +89,9 @@ def get_training_data(years=1):
 
 
 if __name__ == "__main__":
-    # in the end, this should gain data from a live source, and then push it out to firebase. 
+    # in the end, this should gain data from a live source, and then push it out to mongo. 
     # this file will probably require some changes soon 
 
+    # Example usage
     # x = get_training_data(2)
-
-
-
-    
+    pass
