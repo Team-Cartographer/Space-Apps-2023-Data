@@ -8,6 +8,8 @@ from tqdm import tqdm
 import data_manager as dm 
 from utils import *
 
+raise ObsoleteCodeError
+
 pkl_path = "dataset.pkl"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
