@@ -1,7 +1,7 @@
 date_list = {}
 kp_val = {}
 rows = []
-with open('C://Users//zhasi//Downloads//isgi_data_1696720276_541747//Kp_2016-01-01_2021-12-31_D.dat', mode='r') as file:
+with open('K_p_DATA.dat', mode='r') as file:
     for line in file:
         fields = line.strip().split()
         #print(fields[3])
@@ -22,17 +22,22 @@ di = {}
 for row in rows:
     di.update({str(row[0]+ " " +row[1]): int(row[3][0:1])})
 
-
+date_list = []
+time_list = []
 # print(di)
 for key in di.keys():
-    date = key.split(" ")[:-1]
-    time = key.split(" ")[1:]
-    print(date)
-    print(time)
+    date_time_parts = key.split(" ")
+
+    if len(date_time_parts) >= 2:
+        date_list.append(date_time_parts[0])
+        time_list.append(date_time_parts[1])
+
+# print(len(date_list))
+# print(len(time_list))
 
 kp_list = []
-kp_val = di.values()
-print(kp_val)
+kp_val = list(di.values())
+# print(len(kp_val))
 
 
 
