@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from utils import * 
 from tqdm import tqdm 
 from backup_engine import KalmanFilter3D
+from concurrent.futures import ProcessPoolExecutor
 
 year = 2016 
 data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data"
@@ -14,6 +15,24 @@ with open(data_file_path, mode="r") as data_file:
     data: list = list(csv.reader(data_file, delimiter=','))
     data_file.close()
 
+# access the Kp data
+rows = []
+KpDict: dict = {}
+with open('K_p_DATA.dat', mode='r') as f:
+    for line in f:
+        fields = line.strip().split()
+        rows.append(fields)
+        frmt = "%Y-%m-%d %H:%M:%S"
+        timestr = fields[0] + " " + fields[1]
+        timestamp = datetime.strptime(timestr[0:len(timestr) - 4], frmt)
+        KpDict.update({str(timestamp): int(fields[3][0:1])})
+    
+    f.close()
+# ----------------
+
+# @timeit
+# def process_dataset():
+    
 
 def get_datetime(row: int) -> str:
     datetime: str = data[row][0]
@@ -58,7 +77,7 @@ def get_data_list(disp_flux: bool) -> list:
 
 
 class DataFrame:
-    def __init__(self, data_row):
+    def __init__(self, data_row, kpData):
         self.date = self.process_date(data_row[0]) 
         self.plus3hours = self.date + timedelta(hours=3)
         self.dates = [self.date]
@@ -71,8 +90,7 @@ class DataFrame:
         self.filtered_vectors = kalman_filter.filter_measurements(self.raw_vectors)
         # len(filtered_vectors) == len(raw_vectors) == 181 
 
-        self.k_dict = self.fill_Kp_values()
-        self.kp = self.k_dict[self.date.__str__()]
+        self.kp = kpData[self.date.__str__()]
         
         # the actual DataFrame objects to create. You can access these publically or via DataFrame.get_data_frame()
         self.constant_obj = [self.date, self.plus3hours, self.raw_vectors, self.faraday_readings]
@@ -85,34 +103,25 @@ class DataFrame:
         return date_object
     
     def fill_raws(self):
-        raw_vecs = []
-        farad_r = []
-        for row in data:
-            date = self.process_date(row[0])
-            if(self.date <= date <= self.plus3hours):
-                self.dates.append(date)
-                vecs = np.array(get_mag_vec_from_list(row))
-                raw_vecs.append(vecs)
-                farad_r = get_flux_from_list(row)
+        # raw_vecs = []
+        # farad_r = []
+        # for row in data:
+        #     date = self.process_date(row[0])
+        #     if(self.date <= date <= self.plus3hours):
+        #         self.dates.append(date)
+        #         vecs = np.array(get_mag_vec_from_list(row))
+        #         raw_vecs.append(vecs)
+        #         farad_r = get_flux_from_list(row)
         
-        self.dates.append(self.plus3hours)
+        # self.dates.append(self.plus3hours)
         
+        # return raw_vecs, farad_r
+        date_objects = [self.process_date(row[0]) for row in data]
+        mask = (self.date <= date_objects) & (date_objects <= self.plus3hours)
+        self.dates = np.concatenate([self.dates, date_objects[mask], self.plus3hours])
+        raw_vecs = np.array([get_mag_vec_from_list(row) for row in data[mask]])
+        farad_r = np.array([get_flux_from_list(row) for row in data[mask]])
         return raw_vecs, farad_r
-
-    def fill_Kp_values(self):
-        rows, di = [], {}
-
-        with open('K_p_DATA.dat', mode='r') as f:
-            for line in f:
-                fields = line.strip().split()
-                rows.append(fields)
-                timestr = fields[0] + " " + fields[1]
-                timestamp = self.process_date(timestr[0:len(timestr) - 4])
-                di.update({str(timestamp): int(fields[3][0:1])})
-            
-            f.close()
-
-        return di 
     
     def get_data_frame(self): 
         return self.constant_obj, self.training_obj
@@ -144,10 +153,12 @@ class DataFrame:
         
 
 if __name__ == "__main__":
+    print(process_dataset())
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
-    df = DataFrame(get_data_list(True)[180]) ### every 180 steps you move forward 3 hours ###
-    print(df.get_data_frame)
+    #df = DataFrame(get_data_list(True)[180]) ### every 180 steps you move forward 3 hours ###
+    #print(get_data_list(True)[180][1][2])
+    #print(df.get_data_frame)
 
     
 

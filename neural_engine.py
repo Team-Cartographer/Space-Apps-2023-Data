@@ -2,10 +2,47 @@ import torch
 import torch.nn as nn
 import torchvision
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
+
+from tqdm import tqdm 
+import pickle
+import os
+import data_manager as dm 
+from data_manager import DataFrame
 from utils import *
 
+pkl_path = "dataset.pkl"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+class CustomDataset(Dataset): 
+    def __init__(self, transform=None):
+        self.data = []
+
+        if not os.path.exists(pkl_path):
+            data_list = dm.get_data_list(disp_flux=True)
+            iters = int(len(data_list)/180)
+            for i in tqdm(range(iters), desc="Developing the Dataset"):
+                df = DataFrame(data_list[i * 180], dm.KpDict)
+                constants, trainers = df.get_data_frame()
+                self.data.append([constants, trainers])
+            with open(pkl_path, 'wb') as f:
+                pickle.dump(self.data, f)
+        else:
+            with open(pkl_path, 'rb') as f:
+                self.data = pickle.load(f)
+
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        sample = self.data[idx]
+
+        if self.transform:
+            sample = self.transform(sample)
+
+        return sample
 
 
 class SimpleNN(nn.Module):
@@ -26,7 +63,8 @@ input_size: int  # declare this!!!
 hidden_size: int  # declare this!!!
 output_size: int  # declare this!!!
 
-model = SimpleNN(input_size, hidden_size, output_size)
+#model = SimpleNN(input_size, hidden_size, output_size)
+dataset = CustomDataset()
 
 # I have no idea what this does
 criterion = nn.CrossEntropyLoss()  # Example loss function for classification
@@ -34,10 +72,12 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)  # Example optimizer
 
 
 # Data Sets
-train_dataset = torchvision.datasets.MNIST(root="./data",
-                                           train=True,
-                                           transform=transforms.ToTensor(),
-                                           download=True)
+
+# replaced with CustomDataset 
+# train_dataset = torchvision.datasets.MNIST(root="./data",
+#                                            train=True,
+#                                            transform=transforms.ToTensor(),
+#                                            download=True)
 
 test_dataset = torchvision.datasets.MNIST(root="./data",
                                     train=True,
@@ -45,7 +85,7 @@ test_dataset = torchvision.datasets.MNIST(root="./data",
                                     download=True)
 
 # Data loaders
-train_loader = DataLoader(dataset=train_dataset,
+train_loader = DataLoader(dataset=dataset,
                           batch_size=batch_size,
                           shuffle=True)  # I have no clue what shuffle does here. I am copying verbatim off the tutorial
 

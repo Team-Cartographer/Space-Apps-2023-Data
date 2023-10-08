@@ -45,9 +45,12 @@ class KalmanFilter3D:
         filtered_states = []
         last_valid = []
 
-        for measurement in tqdm(measurements, desc="Filtering data"):
+        for measurement in measurements:
             if np.all(np.isnan(measurement)):
-                filtered_states.append(last_valid[len(last_valid) - 1])
+                try:
+                    filtered_states.append(last_valid[len(last_valid) - 1])
+                except IndexError:
+                    filtered_states.append(np.zeros((3,), dtype=int))
             else:
                 self.update(measurement)
                 last_valid.append(self.state_estimate)
