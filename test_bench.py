@@ -17,12 +17,20 @@ with open('C://Users//zhasi//Downloads//isgi_data_1696720276_541747//Kp_2016-01-
 
 di = {}
 
-print(rows)
+# print(rows)
 
 for row in rows:
     di.update({str(row[0]+ " " +row[1]): int(row[3][0:1])})
 
-print(di)
-datetime_list = list(di.keys())
+
+# print(di)
+for key in di.keys():
+    date = key.split(" ")[:-1]
+    time = key.split(" ")[1:]
+    print(date)
+    print(time)
+
 kp_list = list(di.values())
+
+
 
