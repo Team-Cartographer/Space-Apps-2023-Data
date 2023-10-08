@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 
 
 def quiet_day(K):
-    k_avg = np.mean(K)
-    k_norm = K / k_avg
-    qdc = np.mean(k_norm)
+    if (K < 2):
+        k_avg = np.mean(K)
+        k_norm = K / k_avg
+        qdc = np.mean(k_norm)
     return qdc
 
 def h_max(self):
