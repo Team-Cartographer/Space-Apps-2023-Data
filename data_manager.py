@@ -59,7 +59,7 @@ def create_dataset(data, kpData):
     return dataset
 
 
-def get_training_data(years=1, print_year=False):
+def get_training_data(years=1, print_year=False, start_year=2016):
     if years > 5:
         raise ValueError # years cannot be greater than 5 until alex finishes kp data calculation 
     
@@ -78,7 +78,7 @@ def get_training_data(years=1, print_year=False):
     
 
     for i in range(0, years): 
-        year = 2016 + i # DO NOT USE >2022 YET
+        year = start_year + i # DO NOT USE >2022 YET
         print(f'{i+1}. {year}') if print_year else None
         # customize to your liking 
         data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
@@ -99,7 +99,8 @@ if __name__ == "__main__":
     # this file will probably require some changes soon 
 
     # Example usage
-    x = get_training_data(1)
+    #x = get_training_data(start_year=2023)
+    #x = get_training_data(1)[0][i][1][1] -> filtered data per 3 hour period 
     # print(x)
     # indexes, explained -> 
     # first [0] -> all_datasets[0] = dataset for 2016 (first year)
