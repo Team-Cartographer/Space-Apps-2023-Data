@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from utils import * 
 from tqdm import tqdm 
+from backup_engine import KalmanFilter3D
 
 year = 2016
 data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data"
@@ -48,34 +49,47 @@ def get_data_list(disp_flux: bool) -> list:
     
     return data_list
 
-# class DataFrame:
-#     def __init__(self, data_row):
-#         self.date = self.process_date(data_row[0]) 
-#         self.plus3hours = self.date + timedelta(hours=3)
+class DataFrame:
+    @timeit
+    def __init__(self, data_row):
+        self.date = self.process_date(data_row[0]) 
+        self.plus3hours = self.date + timedelta(hours=3)
 
-#         self.raw_vectors = []
-#         self.filtered_vectors = []
-    
-#     def process_date(self, date_string): 
-#         date_format = "%Y-%m-%d %H:%M:%S"
-#         date_object = datetime.strptime(date_string, date_format)
-#         return date_object
-    
-#     def fill_raw_vec(self):
-#         for row in data:
-            
-    
+        self.raw_vectors, self.faraday_readings = self.fill_raws()
+        self.filtered_vectors = []
 
+        self.init_vec = self.raw_vectors[0]
+        kalman_filter = KalmanFilter3D([self.init_vec[0], self.init_vec[1], self.init_vec[2]])
+        self.filtered_vectors = kalman_filter.filter_measurements(self.raw_vectors)
+        
+        self.obj = [self.date, self.plus3hours, self.raw_vectors, self.filtered_vectors, self.faraday_readings]
 
+    
+    def process_date(self, date_string): 
+        date_format = "%Y-%m-%d %H:%M:%S"
+        date_object = datetime.strptime(date_string, date_format)
+        return date_object
+    
+    def fill_raws(self):
+        raw_vecs = []
+        farad_r = []
+        for row in data:
+            date = self.process_date(row[0])
+            if(self.date < date < self.plus3hours):
+                raw_vecs.append(row[1])
+                farad_r.append(row[2])
+        
+        return raw_vecs, farad_r
+    
+    def get_data_frame(self): 
+        return self.obj
 
 
 if __name__ == "__main__":
     # in the end, this should gain data from a live source, and then push it out to firebase. 
     # this file will probably require some changes soon 
 
-    # print(get_data_list(False)[12600:12700])
-    df = DataFrame(get_data_list(False)[0])
-    print(df.date)
-    print(df.plus3hours)
+    df = DataFrame(get_data_list(True)[0])
+    print(df.get_data_frame())
 
-
+    

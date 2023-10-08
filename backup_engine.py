@@ -1,6 +1,5 @@
 from utils import *
 import numpy as np
-import data_manager as dm
 from tqdm import tqdm  
 import matplotlib.pyplot as plt 
 
@@ -58,10 +57,12 @@ class KalmanFilter3D:
 
 
 if __name__ == "__main__":
-    # Example Usage 
-    data = [np.array(dm.get_mag_field_vec(x)) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
-    filt = KalmanFilter3D([data[0][0], data[0][1], data[0][2]])
-    filtered = filt.filter_measurements(data)
+    pass
+
+    # Example Usage (doesn't work coz of circular import)
+    # data = [np.array(dm.get_mag_field_vec(x)) for x in tqdm(range(len(dm.data)), desc="Getting Measurements")]
+    # filt = KalmanFilter3D([data[0][0], data[0][1], data[0][2]])
+    # filtered = filt.filter_measurements(data)
 
     # fig, ax1 = plt.subplots()
     # x = range(500)
