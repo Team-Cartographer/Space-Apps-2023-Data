@@ -58,6 +58,7 @@ def create_dataset(data, kpData):
 
     return dataset
 
+
 def get_training_data(years=1, print_year=False):
     if years > 5:
         raise ValueError # years cannot be greater than 5 until alex finishes kp data calculation 
@@ -78,7 +79,7 @@ def get_training_data(years=1, print_year=False):
     all_datasets = []
 
     for i in range(0, years): 
-        year = 2016 + i # DO NOT USE >2022 YET 
+        year = 2016 + i # DO NOT USE >2022 YET
         print(f'{i+1}. {year}') if print_year else None
         # customize to your liking 
         data_folder_path: str = "C://Users//ashwa//Desktop//DSCOVR_Data" 
