@@ -108,12 +108,17 @@ if __name__ == '__main__':
         lines = file.readlines()
         for line in lines:
             values = line.strip().split(',')
-            values = values[0:len(values) -1]
-            kp_data_2022.extend([int(value) for value in values])
-    print(len(kp_data_2022))
-    print(kp_data_2022)
-    
-    # kp_data = np.array(kp_data)
-    # init_kp = kp_data[len(kp_data)-20]
-    #
-    # print(predict_kp(init_kp, kp_data)) # +-15% error on the predicted value
+            values = values[0:len(values) - 1]
+            values = [int(value) for value in values]
+            kp_data = values 
+
+    kp_data = np.array(kp_data)
+    init_kp = kp_data[0]
+
+    # ORACLE ENGINE EXAMPLE OUTPUT
+    # in the case of this project containing a live data stream,
+    # these values would be displayed on the website, giving users
+    # proper information about what type of geomagnetic event to prepare
+    # for 
+    print(f'Prediction for next Kp Value: {predict_kp(init_kp, kp_data)}') 
+    # +-10% error on the predicted value
