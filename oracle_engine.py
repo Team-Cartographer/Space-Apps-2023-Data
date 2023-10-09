@@ -69,11 +69,26 @@ def find_kp(qdc):
     k_p = 0.67 * np.log10(a)
     return k_p
 
-# testing = find_kp(tot_qdc)
-#
-# final_kp = find_kp(testing)
-#
-# print(final_kp)
+# accessing the 2018 data and the 2022 data
+kp_data_2018 = []
+kp_data_2022 = []
+with open('data//preds//2018_predictions.csv', 'r') as file:
+    lines = file.readlines()
+    for line in lines:
+        values = line.strip().split(',')
+        kp_data_2018.append(values)
+with open('data//preds//2022_predictions.csv', 'r') as file:
+    lines = file.readlines()
+    for line in lines:
+        values = line.strip().split(',')
+        kp_data_2022.extend(values)
+
+print(kp_data_2018)
+# print(kp_data_2022)
+print(len(kp_data_2018))
+
+
+
 
 def predict_kp(init_kp, kp_list):
     initial_state_covariance = np.array([1.0])
@@ -110,7 +125,7 @@ if __name__ == '__main__':
 
     # TODO get data from 'data/preds/{YEAR}_predicted.csv' ASAP 
     
-    kp_data = np.array(kp_data)
-    init_kp = kp_data[len(kp_data)-20]
-
-    print(predict_kp(init_kp, kp_data)) # +-15% error on the predicted value 
+    # kp_data = np.array(kp_data)
+    # init_kp = kp_data[len(kp_data)-20]
+    #
+    # print(predict_kp(init_kp, kp_data)) # +-15% error on the predicted value
