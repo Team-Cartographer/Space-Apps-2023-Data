@@ -1,4 +1,3 @@
 # all folders within data/ but not data/ itself 
-models/
 years/
 preds/
