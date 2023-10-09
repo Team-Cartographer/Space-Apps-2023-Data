@@ -106,13 +106,9 @@ def predict_kp(init_kp, kp_list):
 if __name__ == '__main__':
     tot_qdc = quiet_day(date_list, time_list, kp_val)
     kp_data = []
+    YEAR = 2022
 
-    with open('data/preds/predictions.csv', 'r') as f:
-        reader_obj = csv.reader(f, delimiter=",") 
-        for row in reader_obj: 
-            for ele in row: 
-                if ele:
-                    kp_data.append(int(ele[0]))
+    # TODO get data from 'data/preds/{YEAR}_predicted.csv' ASAP 
     
     kp_data = np.array(kp_data)
     init_kp = kp_data[len(kp_data)-20]
