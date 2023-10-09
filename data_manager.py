@@ -114,18 +114,5 @@ def get_dataset(start_year=2016, years=1, print_year=False):
 
 
 if __name__ == "__main__":
-    # in the end, this should gain data from a live source, and then push it out to mongo. 
-    # this file will probably require some changes soon 
-
-    # Example usage
-    #x = get_training_data(1)[0][i][1][1] -> filtered data per 3 hour period 
-    # print(x)
-    # indexes, explained -> 
-    # first [0] -> all_datasets[0] = dataset for 2016 (first year)
-    # second [0] -> first entry dataset for 2016 [constant_row, training_row]
-    # third [1] -> training_row from first dataset for 2016
-    # fourth [0] -> kp value fromt training row for first dataset (2016) [1] would be the filtered data
-    dataset = get_dataset()[0]
-    print(np.array([arr[1] for arr in dataset]).reshape(-1, 1))
-    
     pass
+

@@ -117,4 +117,4 @@ if __name__ == '__main__':
     kp_data = np.array(kp_data)
     init_kp = kp_data[len(kp_data)-20]
 
-    print(predict_kp(init_kp, kp_data))
+    print(predict_kp(init_kp, kp_data)) # +-15% error on the predicted value 
