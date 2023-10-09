@@ -4,7 +4,7 @@ import numpy as np
 import data_manager as dm 
 import matplotlib.pyplot as plt
 
-# get training dataset --------
+# get training dataset -------- ##
 # dataset = dm.get_dataset(start_year=2017)[0] 
 # X = np.array([arr[1][0] for arr in dataset]) # average filtered data (get past reshape issues)
 # #print(X)
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 # #print(X_train.shape)
 
-# # set up tensorflow model --------
+# # set up tensorflow model -------- ##
 # model = tf.keras.Sequential([
 #     tf.keras.layers.Input(shape=(3, 1)),
 #     tf.keras.layers.Flatten(),
@@ -31,10 +31,10 @@ import matplotlib.pyplot as plt
 #loss, mae = model.evaluate(X_test, Y_test)
 #print("Mean Absolute Error:", mae)
 
-# model.save('data/models/predictor') # UNCOMMENT ALL ABOVE CODE TO GET THE MODEL 
+# model.save('data/models/predictor') # UNCOMMENT ALL ABOVE CODE TO GET THE MODEL ##
 
-#print(len(predictions))
 # visualize (testing)
+# print(len(predictions))
 # plt.scatter(np.arange(len(predictions)), predictions, color='blue')
 # plt.xlabel('X Values')
 # plt.ylabel('Y Values')
@@ -51,6 +51,7 @@ def get_neural_Kp_data(dX, YEAR):
             f.write(f"{int(prediction[0])},")
 
 if __name__ == "__main__":
-    data2 = dm.get_dataset(start_year=2023)[0]
+    YEAR = 2016
+    data2 = dm.get_dataset(start_year=YEAR)[0]
     x = np.array([arr[0][0] for arr in data2])
-    get_neural_Kp_data(x, 2023)
+    get_neural_Kp_data(x, YEAR)
