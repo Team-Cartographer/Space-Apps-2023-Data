@@ -6,7 +6,9 @@ Our development team for this project consists of: <br>
 
 <b> This repository contains all the Data Analysis. For the Website Code, please go <a href="https://github.com/SuleymanEfe/space-apps-website">here.</a></b><br>
 
-<i>More info coming soon...please standby</b>
+Check out our website that we created here: https://www.solarstorm.earth/<br>
+Check out our submission page here: https://www.spaceappschallenge.org/2023/find-a-team/team-cartographer/?tab=project<br>
+<br>Thank you for reading!
 
 <h3>
   Other Team Cartographer Projects can be found at the <a href="https://github.com/Team-Cartographer">Team Cartographer GitHub Teams Page</a>
