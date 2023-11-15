@@ -1,7 +1,7 @@
 # Space Apps Challenge 2023: The Oracle of DSCOVR (Data Analysis) 
 Welcome to the Data Analysis GitHub Repository for <a href="https://www.spaceappschallenge.org/2023/find-a-team/team-cartographer/?tab=details">Team Cartographer's</a> Submission to the 2023 NASA Space Apps Challenge. The Challenge we worked on for this project was <a href="https://www.spaceappschallenge.org/2023/challenges/develop-the-oracle-of-dscovr/">The Oracle of DSCOVR</a>.<br><br>
 
-As of 10/18/23: We won the Pasadena Local Event and are awaiting global judging results!<br>
+For this challenge, we won the Pasadena Local Event and made it to the Global Nominee (Top 500/5000 Teams) Stage!<br>
 
 Our development team for this project consists of: <br>
 <b>Efe C., Abhi A., John B., Alex R., and Rachit P. </b><br><br>
